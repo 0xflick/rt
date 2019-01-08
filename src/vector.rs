@@ -137,3 +137,95 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Vector3;
+
+    #[test]
+    fn test_new_f32() {
+        let vec: Vector3<f32> = Vector3::new(1.0, 2.0, 3.0);
+        assert_eq!(vec.x, 1.0);
+        assert_eq!(vec.y, 2.0);
+        assert_eq!(vec.z, 3.0);
+    }
+
+    #[test]
+    fn test_new_f64() {
+        let vec: Vector3<f64> = Vector3::new(1.0, 2.0, 3.0);
+        assert_eq!(vec.x, 1.0);
+        assert_eq!(vec.y, 2.0);
+        assert_eq!(vec.z, 3.0);
+    }
+
+    #[test]
+    fn test_zeros() {
+        let zeros: Vector3<f32> = Vector3::zero();
+
+        assert_eq!(zeros.x, 0.0);
+        assert_eq!(zeros.y, 0.0);
+        assert_eq!(zeros.z, 0.0);
+    }
+
+    #[test]
+    fn test_squared_length() {
+        let vec = Vector3 {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        };
+
+        assert_eq!(vec.squared_length(), 3.0);
+    }
+
+    #[test]
+    fn test_length() {
+        let vec = Vector3 {
+            x: 1.0,
+            y: 2.0,
+            z: 2.0,
+        };
+
+        assert_eq!(vec.length(), 3.0);
+    }
+
+    #[test]
+    fn test_ops() {
+        let vec1 = Vector3 {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        };
+
+        let vec2 = Vector3 {
+            x: 2.0,
+            y: 2.0,
+            z: 2.0,
+        };
+
+        assert_eq!(
+            vec1 + vec2,
+            Vector3 {
+                x: 3.0,
+                y: 3.0,
+                z: 3.0,
+            }
+        );
+        assert_eq!(
+            vec2 - vec1,
+            Vector3 {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0,
+            }
+        );
+        assert_eq!(
+            vec2 * vec2,
+            Vector3 {
+                x: 4.0,
+                y: 4.0,
+                z: 4.0,
+            }
+        );
+    }
+}
