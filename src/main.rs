@@ -1,20 +1,25 @@
 extern crate image;
+extern crate rt;
 
 use image::ImageBuffer;
 
-mod vec3;
-use vec3::Vec3;
+use rt::color::Color;
 
 fn main() {
-    let nx = 200;
-    let ny = 100;
+    let nx = 1280;
+    let ny = 1024;
 
     let img = ImageBuffer::from_fn(nx, ny, |x, y| {
-        let col = Vec3::new(x as f64 / nx as f64, (ny - y) as f64 / ny as f64, 0.2);
+        let col: Color<f64> = Color {
+            r: f64::from(x) / f64::from(nx),
+            g: f64::from(ny - y) / f64::from(ny),
+            b: 0.2,
+        };
+
         image::Rgb([
-            (col[0] * 255.99) as u8,
-            (col[1] * 255.99) as u8,
-            (col[2] * 255.99) as u8,
+            (col.r * 255.00) as u8,
+            (col.g * 255.00) as u8,
+            (col.b * 255.00) as u8,
         ])
     });
 
