@@ -1,0 +1,6 @@
+error_on_line_overflow = true
+error_on_unformatted = true
+struct_lit_single_line = true
+max_width = 80
+version = "Two"
+edition = "2018"

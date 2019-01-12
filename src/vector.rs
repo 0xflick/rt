@@ -1,105 +1,47 @@
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
-pub trait Sqrt {
-    fn sqrt(self) -> Self;
+use crate::point::Point;
+
+#[derive(PartialEq, Copy, Clone, Debug, Default)]
+pub struct Vector3 {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
-impl Sqrt for f32 {
-    fn sqrt(self) -> f32 {
-        self.sqrt()
-    }
-}
-
-impl Sqrt for f64 {
-    fn sqrt(self) -> f64 {
-        self.sqrt()
-    }
-}
-
-pub trait Zero {
-    fn zero() -> Self;
-}
-
-impl Zero for f32 {
-    fn zero() -> f32 {
-        0.0
-    }
-}
-
-impl Zero for f64 {
-    fn zero() -> f64 {
-        0.0
-    }
-}
-
-pub trait VectorComponent:
-    Add<Self, Output = Self>
-    + Mul<Self, Output = Self>
-    + Sub<Self, Output = Self>
-    + Sqrt
-    + Zero
-    + Copy
-    + PartialEq
-    + Send
-    + Sync
-{
-}
-
-impl<T> VectorComponent for T where
-    T: Add<T, Output = T>
-        + Mul<T, Output = T>
-        + Sub<T, Output = T>
-        + Sqrt
-        + Zero
-        + Copy
-        + PartialEq
-        + Send
-        + Sync
-{
-}
-
-#[derive(PartialEq, Copy, Clone, Debug)]
-pub struct Vector3<T>
-where
-    T: VectorComponent,
-{
-    pub x: T,
-    pub y: T,
-    pub z: T,
-}
-
-impl<T> Vector3<T>
-where
-    T: VectorComponent,
-{
-    pub fn new(x: T, y: T, z: T) -> Self {
-        Vector3 { x, y, z }
-    }
-
+impl Vector3 {
     pub fn zero() -> Self {
         Vector3 {
-            x: T::zero(),
-            y: T::zero(),
-            z: T::zero(),
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
         }
     }
 
-    pub fn length(&self) -> T {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+    pub fn dot(&self, other: &Vector3) -> f64 {
+        self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    pub fn squared_length(&self) -> T {
-        self.x * self.x + self.y * self.y + self.z * self.z
+    pub fn norm(&self) -> f64 {
+        self.dot(self)
+    }
+    pub fn length(&self) -> f64 {
+        self.norm().sqrt()
+    }
+
+    pub fn normalize(&self) -> Vector3 {
+        Vector3 {
+            x: self.x / self.length(),
+            y: self.y / self.length(),
+            z: self.z / self.length(),
+        }
     }
 }
 
-impl<T> Add for Vector3<T>
-where
-    T: VectorComponent,
-{
-    type Output = Vector3<T>;
+impl Add for Vector3 {
+    type Output = Vector3;
 
-    fn add(self, other: Vector3<T>) -> Vector3<T> {
+    fn add(self, other: Vector3) -> Vector3 {
         Vector3 {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -108,13 +50,10 @@ where
     }
 }
 
-impl<T> Sub for Vector3<T>
-where
-    T: VectorComponent,
-{
-    type Output = Vector3<T>;
+impl Sub for Vector3 {
+    type Output = Vector3;
 
-    fn sub(self, other: Vector3<T>) -> Vector3<T> {
+    fn sub(self, other: Vector3) -> Vector3 {
         Vector3 {
             x: self.x - other.x,
             y: self.y - other.y,
@@ -123,44 +62,71 @@ where
     }
 }
 
-impl<T> Mul for Vector3<T>
-where
-    T: VectorComponent,
-{
-    type Output = Vector3<T>;
+impl Neg for Vector3 {
+    type Output = Vector3;
 
-    fn mul(self, other: Vector3<T>) -> Vector3<T> {
+    fn neg(self) -> Vector3 {
         Vector3 {
-            x: self.x * other.x,
-            y: self.y * other.y,
-            z: self.z * other.z,
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+impl Mul<f64> for Vector3 {
+    type Output = Vector3;
+
+    fn mul(self, other: f64) -> Vector3 {
+        Vector3 {
+            x: other * self.x,
+            y: other * self.y,
+            z: other * self.z,
+        }
+    }
+}
+
+impl Mul<Vector3> for f64 {
+    type Output = Vector3;
+
+    fn mul(self, other: Vector3) -> Vector3 {
+        Vector3 {
+            x: self * other.x,
+            y: self * other.y,
+            z: self * other.z,
+        }
+    }
+}
+
+impl Div<f64> for Vector3 {
+    type Output = Vector3;
+
+    fn div(self, other: f64) -> Vector3 {
+        Vector3 {
+            x: self.x / other,
+            y: self.y / other,
+            z: self.z / other,
+        }
+    }
+}
+
+impl From<Point> for Vector3 {
+    fn from(pt: Point) -> Self {
+        Vector3 {
+            x: pt.x,
+            y: pt.y,
+            z: pt.z,
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::Vector3;
-
-    #[test]
-    fn test_new_f32() {
-        let vec: Vector3<f32> = Vector3::new(1.0, 2.0, 3.0);
-        assert_eq!(vec.x, 1.0);
-        assert_eq!(vec.y, 2.0);
-        assert_eq!(vec.z, 3.0);
-    }
-
-    #[test]
-    fn test_new_f64() {
-        let vec: Vector3<f64> = Vector3::new(1.0, 2.0, 3.0);
-        assert_eq!(vec.x, 1.0);
-        assert_eq!(vec.y, 2.0);
-        assert_eq!(vec.z, 3.0);
-    }
+    use super::*;
 
     #[test]
     fn test_zeros() {
-        let zeros: Vector3<f32> = Vector3::zero();
+        let zeros: Vector3 = Vector3::zero();
 
         assert_eq!(zeros.x, 0.0);
         assert_eq!(zeros.y, 0.0);
@@ -175,7 +141,7 @@ mod tests {
             z: 1.0,
         };
 
-        assert_eq!(vec.squared_length(), 3.0);
+        assert_eq!(vec.norm(), 3.0);
     }
 
     #[test]
@@ -220,11 +186,47 @@ mod tests {
             }
         );
         assert_eq!(
-            vec2 * vec2,
+            -vec1,
             Vector3 {
-                x: 4.0,
+                x: -1.0,
+                y: -1.0,
+                z: -1.0,
+            }
+        );
+    }
+
+    #[test]
+    fn test_scalar_mul() {
+        let vec = Vector3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        };
+
+        assert_eq!(
+            2.0 * vec,
+            Vector3 {
+                x: 2.0,
                 y: 4.0,
-                z: 4.0,
+                z: 6.0,
+            }
+        );
+    }
+
+    #[test]
+    fn test_scalar_div() {
+        let vec = Vector3 {
+            x: 10.0,
+            y: 20.0,
+            z: 30.0,
+        };
+
+        assert_eq!(
+            vec / 10.0,
+            Vector3 {
+                x: 1.0,
+                y: 2.0,
+                z: 3.0,
             }
         );
     }
