@@ -2,6 +2,7 @@ use crate::ray::Ray;
 use crate::scene::HitRecord;
 use crate::util::random_in_unit_sphere;
 use crate::vector::Vector3;
+use rand::prelude::*;
 
 pub struct Scatter {
     pub scattered: Ray,
@@ -54,5 +55,70 @@ impl Material for Metal {
         } else {
             None
         }
+    }
+}
+
+fn refract(v: Vector3, n: Vector3, ni_over_nt: f64) -> Option<Vector3> {
+    let v = v.normalize();
+    let dt = v.dot(&n);
+    let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
+    if discriminant > 0.0 {
+        Some(ni_over_nt * (v - n * dt) - n * discriminant.sqrt())
+    } else {
+        None
+    }
+}
+
+fn schlick(cosine: f64, ref_idx: f64) -> f64 {
+    let r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+    let r0 = r0 * r0;
+    r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+}
+
+pub struct Dialectric {
+    pub ref_idx: f64,
+}
+
+impl Material for Dialectric {
+    fn scatter(&self, ray: &Ray, rec: &HitRecord) -> Option<Scatter> {
+        let (outward_normal, ni_over_nt, cosine) =
+            if ray.direction.dot(&rec.normal) > 0.0 {
+                (
+                    -rec.normal,
+                    self.ref_idx,
+                    self.ref_idx * ray.direction.dot(&rec.normal)
+                        / ray.direction.length(),
+                )
+            } else {
+                (
+                    rec.normal,
+                    1.0 / self.ref_idx,
+                    -ray.direction.dot(&rec.normal) / ray.direction.length(),
+                )
+            };
+
+        let reflect_prob = schlick(cosine, self.ref_idx);
+        let scattered = match (
+            refract(ray.direction, outward_normal, ni_over_nt),
+            rand::thread_rng().gen::<f64>() < reflect_prob,
+        ) {
+            (Some(refracted), false) => Ray {
+                origin: rec.p,
+                direction: refracted,
+            },
+            (_, _) => Ray {
+                origin: rec.p,
+                direction: reflect(ray.direction, rec.normal),
+            },
+        };
+
+        Some(Scatter {
+            scattered,
+            attenuation: Vector3 {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0,
+            },
+        })
     }
 }

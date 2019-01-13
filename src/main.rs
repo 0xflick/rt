@@ -3,7 +3,7 @@ use rand::prelude::*;
 
 use rt::camera::Camera;
 use rt::color::Color;
-use rt::material::{Lambertian, Metal};
+use rt::material::{Dialectric, Lambertian, Metal};
 use rt::point::Point;
 use rt::scene::{HitList, Sphere};
 use rt::util::render_ray;
@@ -26,9 +26,9 @@ fn main() {
         radius: 0.5,
         material: Box::new(Lambertian {
             albedo: Vector3 {
-                x: 0.8,
-                y: 0.3,
-                z: 0.3,
+                x: 0.1,
+                y: 0.2,
+                z: 0.8,
             },
         }),
     });
@@ -60,7 +60,7 @@ fn main() {
                 y: 0.6,
                 z: 0.2,
             },
-            fuzz: 1.0,
+            fuzz: 0.0,
         }),
     });
     world.push(Sphere {
@@ -70,14 +70,7 @@ fn main() {
             z: -1.0,
         },
         radius: 0.5,
-        material: Box::new(Metal {
-            albedo: Vector3 {
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
-            },
-            fuzz: 0.3,
-        }),
+        material: Box::new(Dialectric { ref_idx: 1.5 }),
     });
 
     let img = ImageBuffer::from_fn(nx, ny, |x, y| {
