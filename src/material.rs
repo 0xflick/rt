@@ -1,8 +1,9 @@
+use rand::prelude::*;
+
 use crate::ray::Ray;
 use crate::scene::HitRecord;
 use crate::util::random_in_unit_sphere;
 use crate::vector::Vector3;
-use rand::prelude::*;
 
 pub struct Scatter {
     pub scattered: Ray,

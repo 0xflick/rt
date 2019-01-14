@@ -6,7 +6,11 @@ use crate::ray::Ray;
 use crate::scene::Hit;
 use crate::vector::Vector3;
 
-pub fn render_ray<T: Hit>(ray: &Ray, world: &T, depth: usize) -> Color {
+pub fn render_ray<T: Hit + ?Sized>(
+    ray: &Ray,
+    world: &T,
+    depth: usize,
+) -> Color {
     if let Some(rec) = world.hit(ray, 0.001, std::f64::INFINITY) {
         match (depth < 50, rec.material.scatter(ray, &rec)) {
             (true, Some(s)) => {
