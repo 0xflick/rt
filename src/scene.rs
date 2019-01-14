@@ -41,7 +41,7 @@ impl Hit for Sphere {
             Some(HitRecord {
                 t: t_hit,
                 p,
-                normal: (p - self.center).normalize(),
+                normal: ((p - self.center) * self.radius.signum()).normalize(),
                 material: self.material.as_ref(),
             })
         } else {
