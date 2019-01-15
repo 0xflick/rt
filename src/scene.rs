@@ -28,8 +28,9 @@ impl Hit for Sphere {
         let c = direction.norm() - self.radius * self.radius;
         let discriminant = b * b - a * c;
         if discriminant > 0.0 {
-            let t0 = (-b - discriminant.sqrt()) / a;
-            let t1 = (-b + discriminant.sqrt()) / a;
+            let dsqrt = discriminant.sqrt();
+            let t0 = (-b - dsqrt) / a;
+            let t1 = (-b + dsqrt) / a;
 
             if t0 > t_max || t1 < t_min {
                 return None;
@@ -68,9 +69,12 @@ impl<'a> HitList<'a> {
 impl<'a> Hit for HitList<'a> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut closest: Option<HitRecord> = None;
+        let mut t = t_max;
         for hitable in &self.data {
-            let t = closest.as_ref().map_or(t_max, |h| h.t);
-            closest = hitable.hit(ray, t_min, t).or(closest);
+            if let Some(rec) = hitable.hit(ray, t_min, t) {
+                t = rec.t;
+                closest = Some(rec);
+            }
         }
         closest
     }

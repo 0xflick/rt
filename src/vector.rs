@@ -26,17 +26,22 @@ impl Vector3 {
         }
     }
 
+    #[inline]
     pub fn dot(&self, other: &Vector3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
+    #[inline]
     pub fn norm(&self) -> f64 {
         self.dot(self)
     }
+
+    #[inline]
     pub fn length(&self) -> f64 {
         self.norm().sqrt()
     }
 
+    #[inline]
     pub fn normalize(&self) -> Vector3 {
         Vector3 {
             x: self.x / self.length(),
@@ -49,6 +54,7 @@ impl Vector3 {
 impl Add for Vector3 {
     type Output = Vector3;
 
+    #[inline]
     fn add(self, other: Vector3) -> Vector3 {
         Vector3 {
             x: self.x + other.x,
@@ -61,6 +67,7 @@ impl Add for Vector3 {
 impl Sub for Vector3 {
     type Output = Vector3;
 
+    #[inline]
     fn sub(self, other: Vector3) -> Vector3 {
         Vector3 {
             x: self.x - other.x,
@@ -73,6 +80,7 @@ impl Sub for Vector3 {
 impl Neg for Vector3 {
     type Output = Vector3;
 
+    #[inline]
     fn neg(self) -> Vector3 {
         Vector3 {
             x: -self.x,
@@ -85,6 +93,7 @@ impl Neg for Vector3 {
 impl Mul<f64> for Vector3 {
     type Output = Vector3;
 
+    #[inline]
     fn mul(self, other: f64) -> Vector3 {
         Vector3 {
             x: other * self.x,
@@ -97,6 +106,7 @@ impl Mul<f64> for Vector3 {
 impl Mul<Vector3> for f64 {
     type Output = Vector3;
 
+    #[inline]
     fn mul(self, other: Vector3) -> Vector3 {
         Vector3 {
             x: self * other.x,
@@ -109,6 +119,7 @@ impl Mul<Vector3> for f64 {
 impl Div<f64> for Vector3 {
     type Output = Vector3;
 
+    #[inline]
     fn div(self, other: f64) -> Vector3 {
         Vector3 {
             x: self.x / other,
