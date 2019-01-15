@@ -12,7 +12,7 @@ use rt::vector::Vector3;
 fn main() {
     let nx = 1500;
     let ny = 750;
-    let num_samples = 100;
+    let num_samples = 5;
 
     let mut rng = thread_rng();
 
@@ -75,21 +75,21 @@ fn main() {
 fn random_scene() -> Box<Hit> {
     let mut rng = thread_rng();
     let mut hitlist = HitList::new();
-    hitlist.push(Sphere {
-        center: Point {
+    hitlist.push(Sphere::new(
+        Point {
             x: 0.0,
             y: -1000.0,
             z: 0.0,
         },
-        radius: 1000.0,
-        material: Box::new(Lambertian {
+        1000.0,
+        Box::new(Lambertian {
             albedo: Vector3 {
                 x: 0.5,
                 y: 0.5,
                 z: 0.0,
             },
         }),
-    });
+    ));
 
     for a in -11..11 {
         for b in -11..11 {
@@ -106,22 +106,22 @@ fn random_scene() -> Box<Hit> {
             };
             if (center - t).length() > 0.9 {
                 if choose_mat < 0.8 {
-                    hitlist.push(Sphere {
+                    hitlist.push(Sphere::new(
                         center,
-                        radius: 0.2,
-                        material: Box::new(Lambertian {
+                        0.2,
+                        Box::new(Lambertian {
                             albedo: Vector3 {
                                 x: rng.gen::<f64>() * rng.gen::<f64>(),
                                 y: rng.gen::<f64>() * rng.gen::<f64>(),
                                 z: rng.gen::<f64>() * rng.gen::<f64>(),
                             },
                         }),
-                    });
+                    ));
                 } else if choose_mat < 0.95 {
-                    hitlist.push(Sphere {
+                    hitlist.push(Sphere::new(
                         center,
-                        radius: 0.2,
-                        material: Box::new(Metal {
+                        0.2,
+                        Box::new(Metal {
                             albedo: Vector3 {
                                 x: 0.5 * (1.0 + rng.gen::<f64>()),
                                 y: 0.5 * (1.0 + rng.gen::<f64>()),
@@ -129,52 +129,52 @@ fn random_scene() -> Box<Hit> {
                             },
                             fuzz: 0.5 * rng.gen::<f64>(),
                         }),
-                    });
+                    ));
                 } else {
-                    hitlist.push(Sphere {
+                    hitlist.push(Sphere::new(
                         center,
-                        radius: 0.2,
-                        material: Box::new(Dialectric { ref_idx: 1.5 }),
-                    });
+                        0.2,
+                        Box::new(Dialectric { ref_idx: 1.5 }),
+                    ));
                 }
             }
         }
     }
 
-    hitlist.push(Sphere {
-        center: Point {
+    hitlist.push(Sphere::new(
+        Point {
             x: 0.0,
             y: 1.0,
             z: 0.0,
         },
-        radius: 1.0,
-        material: Box::new(Dialectric { ref_idx: 1.5 }),
-    });
+        1.0,
+        Box::new(Dialectric { ref_idx: 1.5 }),
+    ));
 
-    hitlist.push(Sphere {
-        center: Point {
+    hitlist.push(Sphere::new(
+        Point {
             x: -4.0,
             y: 1.0,
             z: 0.0,
         },
-        radius: 1.0,
-        material: Box::new(Lambertian {
+        1.0,
+        Box::new(Lambertian {
             albedo: Vector3 {
                 x: 0.4,
                 y: 0.2,
                 z: 0.1,
             },
         }),
-    });
+    ));
 
-    hitlist.push(Sphere {
-        center: Point {
+    hitlist.push(Sphere::new(
+        Point {
             x: 4.0,
             y: 1.0,
             z: 0.0,
         },
-        radius: 1.0,
-        material: Box::new(Metal {
+        1.0,
+        Box::new(Metal {
             albedo: Vector3 {
                 x: 0.7,
                 y: 0.6,
@@ -182,7 +182,7 @@ fn random_scene() -> Box<Hit> {
             },
             fuzz: 0.0,
         }),
-    });
+    ));
 
     Box::new(hitlist)
 }

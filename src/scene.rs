@@ -18,33 +18,64 @@ pub struct Sphere {
     pub center: Point,
     pub radius: f64,
     pub material: Box<Material>,
+    radius2: f64,
+}
+
+fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
+    let discr = b * b - 4.0 * a * c;
+    if discr < 0.0 {
+        None
+    } else if discr == 0.0 {
+        let x = -0.5 * b / a;
+        Some((x, x))
+    } else {
+        let q = if b > 0.0 {
+            -0.5 * (b + discr.sqrt())
+        } else {
+            -0.5 * (b - discr.sqrt())
+        };
+        let t0 = q / a;
+        let t1 = c / q;
+
+        if t1 < t0 {
+            Some((t1, t0))
+        } else {
+            Some((t0, t1))
+        }
+    }
+}
+
+impl Sphere {
+    pub fn new(center: Point, radius: f64, material: Box<Material>) -> Self {
+        Sphere {
+            center,
+            radius,
+            material,
+            radius2: radius * radius,
+        }
+    }
 }
 
 impl Hit for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let direction = ray.origin - self.center;
         let a = ray.direction.norm();
-        let b = direction.dot(&ray.direction);
-        let c = direction.norm() - self.radius * self.radius;
-        let discriminant = b * b - a * c;
-        if discriminant > 0.0 {
-            let dsqrt = discriminant.sqrt();
-            let t0 = (-b - dsqrt) / a;
-            let t1 = (-b + dsqrt) / a;
-
+        let b = 2.0 * direction.dot(&ray.direction);
+        let c = direction.norm() - self.radius2;
+        if let Some((t0, t1)) = solve_quadratic(a, b, c) {
             if t0 > t_max || t1 < t_min {
-                return None;
-            };
-
-            let t_hit = if t0 < t_min { t1 } else { t0 };
-
-            let p = ray.at(t_hit);
-            Some(HitRecord {
-                t: t_hit,
-                p,
-                normal: ((p - self.center) * self.radius.signum()).normalize(),
-                material: self.material.as_ref(),
-            })
+                None
+            } else {
+                let t = if t0 < t_min { t1 } else { t0 };
+                let p = ray.at(t);
+                Some(HitRecord {
+                    t,
+                    p,
+                    normal: ((p - self.center) * self.radius.signum())
+                        .normalize(),
+                    material: self.material.as_ref(),
+                })
+            }
         } else {
             None
         }
