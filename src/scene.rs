@@ -22,17 +22,17 @@ pub struct Sphere {
 }
 
 fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
-    let discr = b * b - 4.0 * a * c;
+    let discr = b * b - a * c;
     if discr < 0.0 {
         None
     } else if discr == 0.0 {
-        let x = -0.5 * b / a;
+        let x = -b / a;
         Some((x, x))
     } else {
         let q = if b > 0.0 {
-            -0.5 * (b + discr.sqrt())
+            -b - discr.sqrt()
         } else {
-            -0.5 * (b - discr.sqrt())
+            -b + discr.sqrt()
         };
         let t0 = q / a;
         let t1 = c / q;
@@ -60,7 +60,7 @@ impl Hit for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let direction = ray.origin - self.center;
         let a = ray.direction.norm();
-        let b = 2.0 * direction.dot(&ray.direction);
+        let b = direction.dot(&ray.direction);
         let c = direction.norm() - self.radius2;
         if let Some((t0, t1)) = solve_quadratic(a, b, c) {
             if t0 > t_max || t1 < t_min {
