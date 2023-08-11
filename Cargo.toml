@@ -2,7 +2,7 @@
 name = "rt"
 version = "0.1.0"
 authors = ["alexflk <alexsflick@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 image = "*"
