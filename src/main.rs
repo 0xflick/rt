@@ -72,7 +72,7 @@ fn main() {
         .unwrap();
 }
 
-fn random_scene() -> Box<Hit> {
+fn random_scene() -> Box<dyn Hit> {
     let mut rng = thread_rng();
     let mut hitlist = HitList::new();
     hitlist.push(Sphere::new(

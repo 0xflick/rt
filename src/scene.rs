@@ -7,7 +7,7 @@ pub struct HitRecord<'a> {
     pub t: f64,
     pub p: Point,
     pub normal: Vector3,
-    pub material: &'a Material,
+    pub material: &'a dyn Material,
 }
 
 pub trait Hit {
@@ -17,7 +17,7 @@ pub trait Hit {
 pub struct Sphere {
     pub center: Point,
     pub radius: f64,
-    pub material: Box<Material>,
+    pub material: Box<dyn Material>,
     radius2: f64,
 }
 
@@ -46,7 +46,7 @@ fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
 }
 
 impl Sphere {
-    pub fn new(center: Point, radius: f64, material: Box<Material>) -> Self {
+    pub fn new(center: Point, radius: f64, material: Box<dyn Material>) -> Self {
         Sphere {
             center,
             radius,
@@ -84,7 +84,7 @@ impl Hit for Sphere {
 
 #[derive(Default)]
 pub struct HitList<'a> {
-    data: Vec<Box<Hit + 'a>>,
+    data: Vec<Box<dyn Hit + 'a>>,
 }
 
 impl<'a> HitList<'a> {
